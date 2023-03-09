@@ -1,2 +1,2 @@
-# test-data-dashboard
-Streamlit dashboard to visualize test data
+# Test data dashboard
+Dashboard to visualize test data using streamlit.io
