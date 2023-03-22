@@ -12,6 +12,9 @@ css = '''
 '''
 st.markdown(css, unsafe_allow_html=True)
 
+url='https://drive.google.com/file/d/1hF4mIIhpUS7YROmMTlSQQxU2nEvRTePg/view?usp=sharing'
+url='https://drive.google.com/uc?id=' + url.split('/')[-2]
+
 # Connect to Deta Base with your Data Key
 deta = Deta(st.secrets["data_key"])
 drive = deta.Drive("Bachelorarbeit")
@@ -20,11 +23,11 @@ filename = "V1_gesamt.csv"
 
 # load data in cache
 @st.cache_data
-def load_data(name: str) -> pd.DataFrame:
-    data = pd.read_csv(drive.get(name), sep="\t", index_col=[0])
+def load_data(url: str) -> pd.DataFrame:
+    data = pd.read_csv(url, sep="\t", index_col=[0])
     return data
 
-dataset = load_data(filename)
+dataset = load_data(url)
 
 
 # sidebar
