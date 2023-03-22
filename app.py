@@ -12,9 +12,6 @@ css = '''
 '''
 st.markdown(css, unsafe_allow_html=True)
 
-url='https://drive.google.com/file/d/1hF4mIIhpUS7YROmMTlSQQxU2nEvRTePg/view?usp=sharing'
-url='https://drive.google.com/uc?id=' + url.split('/')[-2]
-
 # Connect to Deta Base with your Data Key
 deta = Deta(st.secrets["data_key"])
 drive = deta.Drive("Bachelorarbeit")
@@ -23,11 +20,11 @@ filename = "V1_gesamt.csv"
 
 # load data in cache
 @st.cache_data
-def load_data(url: str) -> pd.DataFrame:
-    data = pd.read_csv(url, sep="\t", index_col=[0])
+def load_data(name: str) -> pd.DataFrame:
+    data = pd.read_csv(drive.get(name).read(), sep="\t", index_col=[0])
     return data
 
-dataset = load_data(url)
+dataset = load_data(filename)
 
 
 # sidebar
@@ -47,8 +44,6 @@ st.write("---")
 
 # Chosen test series:
 st.write(f"### Test series: &ensp;{test_series}")
-
-st.write(dataset)
 
 max_test_cycle = int(dataset["autoCounter"].iloc[-1])
 test_cycle = st.slider("Choose test cycle:", 1, max_test_cycle)
