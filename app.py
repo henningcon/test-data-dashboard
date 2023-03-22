@@ -17,7 +17,7 @@ deta = Deta(st.secrets["data_key"])
 drive = deta.Drive("Bachelorarbeit")
 
 filename = "V1_gesamt.csv"
-url = "https://drive.deta.sh/v1/a0fgji9w6tz/measured_data/files/download?name={V1_gesamt.csv}"
+url = "https://drive.deta.sh/v1/a0fgji9w6tz/measured_data/files/download?name=V1_gesamt.csv"
 headers = {"X-Api-Key": st.secrets["data_key"]}
 # load data in cache
 @st.cache_data
