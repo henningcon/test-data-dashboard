@@ -21,11 +21,11 @@ url = "https://drive.deta.sh/v1/a0fgji9w6tz/measured_data/files/download?name={V
 headers = {"X-Api-Key": st.secrets["data_key"]}
 # load data in cache
 @st.cache_data
-def load_data(name: str) -> pd.DataFrame:
-    data = pd.read_csv(url, sep="\t", index_col=[0], storage_options = headers)
+def load_data(path: str) -> pd.DataFrame:
+    data = pd.read_csv(path, sep="\t", index_col=[0], storage_options = headers)
     return data
 
-dataset = load_data(filename)
+dataset = load_data(url)
 
 
 # sidebar
