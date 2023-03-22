@@ -48,6 +48,8 @@ st.write("---")
 # Chosen test series:
 st.write(f"### Test series: &ensp;{test_series}")
 
+st.write(dataset)
+
 max_test_cycle = int(dataset["autoCounter"].iloc[-1])
 test_cycle = st.slider("Choose test cycle:", 1, max_test_cycle)
 
