@@ -27,11 +27,11 @@ type_dict = {"autoCounter": "int16",
              "compression length [mm]": "int8",
             }  
 
-error_thresholds = {"F_FrictionStatic": 1500, 
-                    "TV2_hi [µm]": 25, 
-                    "TV3_he [µm]": 20,
-                    "POS1_offset": 1,
-                    "K_Le [l/min.bar]": 0.0005}
+error_thresholds = {"friction [N]": 1500, 
+                    "Cy. int. leakage [µm]": 25, 
+                    "Cy. ext. leakage [µm]": 20,
+                    "position offset [mm]": 1,
+                    "ext. leakage [l/min.bar]": 0.0005} 
 
 
 # --- STREAMLIT CONFIGURATION ---
