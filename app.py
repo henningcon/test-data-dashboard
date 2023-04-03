@@ -1,12 +1,31 @@
+import altair as alt
 import numpy as np
 import pandas as pd
-import plotly.express as px
 import streamlit as st
 from deta import Deta
 
-# ----------------------------------------------------------------
-# Constants/Parameters
-# ----------------------------------------------------------------
+# --- CONSTANTS/PARAMETERS ---
+
+rename_dict = {"i_POS1_cal [m]": "position",
+               "i_FS4_cal_m3/s": "flow FS4",
+               "i_PS1_filt [Pa]": "pressure PS1",
+               "i_PS2_filt [Pa]": "pressure PS2",
+               "i_PS3_filt [Pa]": "pressure PS3",
+               "loadF": "load",
+               "i_TS1_cal": "temp T1",
+               "sv_compressionLength": "compression length [mm]",
+               "F_FrictionStatic": "friction [N]",
+               "TV2_hi [µm]": "Cy. int. leakage [µm]",
+               "TV3_he [µm]": "Cy. ext. leakage [µm]",
+               "POS1_offset": "position offset [mm]",
+               "K_Le [l/min.bar]": "ext. leakage [l/min.bar]"
+                }
+
+type_dict = {"autoCounter": "int16",
+             "o_SV1": "int8",
+             "o_SV2": "int8",
+             "compression length [mm]": "int8",
+            }  
 
 error_thresholds = {"F_FrictionStatic": 1500, 
                     "TV2_hi [µm]": 25, 
@@ -14,9 +33,8 @@ error_thresholds = {"F_FrictionStatic": 1500,
                     "POS1_offset": 1,
                     "K_Le [l/min.bar]": 0.0005}
 
-# ----------------------------------------------------------------
-# Streamlit style configuration
-# ----------------------------------------------------------------
+
+# --- STREAMLIT CONFIGURATION ---
 
 # width configuration, change max_width value
 css = '''
@@ -26,9 +44,8 @@ css = '''
 '''
 st.markdown(css, unsafe_allow_html=True)
 
-# ----------------------------------------------------------------
-# Load data method
-# ----------------------------------------------------------------
+
+# --- LOAD DATA ---
 
 url = "https://drive.deta.sh/v1/a0fgji9w6tz/measured_data/files/download?name=" # name of the file has to be added to the url
 headers = {"X-Api-Key": st.secrets["data_key"]}
@@ -37,12 +54,26 @@ headers = {"X-Api-Key": st.secrets["data_key"]}
 @st.cache_data
 def load_data(path: str) -> pd.DataFrame:
     data = pd.read_csv(path, sep="\t", index_col=[0], storage_options = headers)
+    # manipulate dataset for easier handling, unit and dtype conversion
+    # unnecessary columns
+    data.drop(columns=["Ventilueberdeckung [%]", "sv_loadLength"], inplace=True)
+    # renaming columns
+    data.rename(columns=rename_dict, inplace=True)
+    for key, value in type_dict.items():
+        data[key] = data[key].astype(value)
+    # timestamp nm to ms
+    data["Timestamp UTC"] = (data["Timestamp UTC"].values*1e-6)
+    data["Timestamp UTC"] = data["Timestamp UTC"].round()
+    # position m to mm
+    data["position"] = data["position"].values*1e3
+    # pressure Pa to bar
+    for i in range(3):
+        data[f"pressure PS{i+1}"] = data[f"pressure PS{i+1}"].values*1e-5
+        data[f"pressure PS{i+1}"] = data[f"pressure PS{i+1}"].round(4)
     return data
 
 
-#----------------------------------------------------------------
-# Streamlit dashboard
-# ----------------------------------------------------------------
+# --- STREAMLIT DASHBOARD ---
 
 ### sidebar
 
@@ -57,9 +88,10 @@ measurements = st.sidebar.multiselect("Choose presented measurements:", [
     "Pressure", "Position", "Flow", "Temperature"])
 
 st.sidebar.write("---")
-st.sidebar.write("Error threshholds:")
-for key, value in error_thresholds.items():
-    st.sidebar.write(f"{key}: {value}")
+st.sidebar.write("#### Error thresholds:")
+error_threshold_df = pd.DataFrame.from_dict(error_thresholds, columns=["value"], orient="index")
+error_threshold_df.index.name="Error"
+st.sidebar.dataframe(error_threshold_df, use_container_width=True)
 
 
 ### dashboard
@@ -77,15 +109,20 @@ test_cycle = st.slider("Choose test cycle:", 1, max_test_cycle)
 
 # creating dataframe of chosen test cycle from the dataset
 cycle_df = pd.DataFrame(dataset.loc[dataset["autoCounter"] == test_cycle])
-time = range(10, cycle_df.shape[0]*10+10, 10)
-cycle_df["Time"] = time
+
+# adding time column
+start_time = cycle_df["Timestamp UTC"].iloc[0]
+cycle_df["time"] = cycle_df["Timestamp UTC"].apply(lambda x: x - start_time)
+
+with st.expander("Click to see dataframe"):
+    st.write(cycle_df)
 
 ### Diyplay the error parameters of the chosen test cycle
 
 # checking which parameter is above its error threshold
 error_check = []
 for key, value in error_thresholds.items():
-    if cycle_df[key].iloc[1] > value:
+    if cycle_df[key].iloc[0] > value:
         error_check.append(":red[Error]")
     else:
         error_check.append(":green[Good]")
@@ -93,42 +130,77 @@ for key, value in error_thresholds.items():
 st.write("#### Error parameters:")
 col1, col2, col3, col4, col5 = st.columns(5)
 with col1:
-    st.metric(label="Friction [N]", value=round(cycle_df["F_FrictionStatic"].iloc[1], 2))
+    st.metric(label="Friction [N]", value=round(cycle_df["friction [N]"].iloc[0], 2))
     st.write(error_check[0])
 with col2:
-    st.metric(label="Cy. int. Leakage [µm]", value=round(cycle_df["TV2_hi [µm]"].iloc[1], 2))
+    st.metric(label="Cy. int. Leakage [µm]", value=round(cycle_df["Cy. int. leakage [µm]"].iloc[0], 2))
     st.write(error_check[1])
 with col3:
-    st.metric(label="Cy. ext. Leakage [µm]", value=round(cycle_df["TV3_he [µm]"].iloc[1], 2))
+    st.metric(label="Cy. ext. Leakage [µm]", value=round(cycle_df["Cy. ext. leakage [µm]"].iloc[0], 2))
     st.write(error_check[2])
 with col4:
-    st.metric(label="Pos. Offset [mm]", value=round(cycle_df["POS1_offset"].iloc[1],4))
+    st.metric(label="Pos. Offset [mm]", value=round(cycle_df["position offset [mm]"].iloc[0],4))
     st.write(error_check[3])
 with col5:
-    st.metric(label="Ext. Leakage [l/min*bar]", value=round(cycle_df["K_Le [l/min.bar]"].iloc[1],4))
+    st.metric(label="Ext. Leakage [l/min*bar]", value=round(cycle_df["ext. leakage [l/min.bar]"].iloc[0],4))
     st.write(error_check[4])
 
 "---"
 
-if "Pressure" in measurements:
-    pressure_df = pd.DataFrame(cycle_df[["Time", "i_PS1_filt [Pa]", "i_PS2_filt [Pa]", "i_PS3_filt [Pa]"]])
-    pressure_df.rename(columns={"i_PS1_filt [Pa]": "PS1 [bar]", "i_PS2_filt [Pa]": "PS2 [bar]", "i_PS3_filt [Pa]": "PS3 [bar]"}, inplace=True)
-    pressure_df["PS1 [bar]"] = pressure_df["PS1 [bar]"] * 1e-5
-    pressure_df["PS2 [bar]"] = pressure_df["PS2 [bar]"] * 1e-5
-    pressure_df["PS3 [bar]"] = pressure_df["PS3 [bar]"] * 1e-5
-    st.line_chart(pressure_df, x = "Time", height=600)
+# Choose presented data or diagrams
+measurements = st.multiselect("Choose presented measurements:", [
+    "PS1", "PS2", "PS3", "Position", "Flow", "Temperature"])
+
+axes = []
+time_domain = cycle_df["time"].iloc[-1]
+
+ps1_bool = "PS1" in measurements
+ps2_bool = "PS2" in measurements
+ps3_bool = "PS3" in measurements
+
+if ps1_bool or ps2_bool or ps3_bool:
+    pressure_df = pd.DataFrame([])
+    pressure_df["time"] = cycle_df["time"]
+    if "PS1" in measurements:
+        pressure_df["PS1"] = cycle_df["pressure PS1"]
+    if "PS2" in measurements:
+        pressure_df["PS2"] = cycle_df["pressure PS2"]
+    if "PS3" in measurements:
+        pressure_df["PS3"] = cycle_df["pressure PS3"]
+    # melt dataframe
+    if len(pressure_df.columns) > 1:
+        melted = pd.melt(pressure_df, id_vars='time', var_name="Pressure", value_name='value')
+
+
+    y1_axis = alt.Chart(melted).mark_line().encode(
+        x=alt.X("time", axis=alt.Axis(title='Time [ms]'), scale=alt.Scale(domain=(0,time_domain))),
+        y=alt.Y("value", axis=alt.Axis(title='Pressure [bar]'), scale=alt.Scale(domain=(0,220))),
+        color = alt.Color("Pressure", legend=alt.Legend(orient="left"), title="")
+    )
+    axes.append(y1_axis)
 
 if "Position" in measurements:
-    position_df = pd.DataFrame(cycle_df[["Time", "i_POS1_cal [m]"]])
-    # position_df.rename(columns={"i_PS1_filt [Pa]": "PS1 [bar]"}, inplace=True)
-    st.line_chart(position_df, x = "Time")
+    position_df = pd.melt(cycle_df[["time", "position"]], id_vars="time", var_name="Position", value_name="value")
+    y2_axis = alt.Chart(position_df).mark_line().encode(
+        x=alt.X("time", axis=alt.Axis(title='Time [ms]'), scale=alt.Scale(domain=(0,time_domain))),
+        y=alt.Y("value", axis=alt.Axis(title='Position [mm]'), scale=alt.Scale(domain=(0,400))),
+        color = alt.Color("Position")
+    )
+    axes.append(y2_axis)
 
 if "Flow" in measurements:
-    position_df = pd.DataFrame(cycle_df[["Time", "i_FS4_cal_m3/s"]])
-    # position_df.rename(columns={"i_PS1_filt [Pa]": "PS1 [bar]"}, inplace=True)
-    st.line_chart(position_df, x = "Time")
+    flow_df = pd.melt(cycle_df[["time", "flow FS4"]], id_vars="time", var_name="Flow", value_name="value")
+    y3_axis = alt.Chart(flow_df).mark_line(color="purple").encode(
+        x=alt.X("time", axis=alt.Axis(title='Time [ms]'), scale=alt.Scale(domain=(0,time_domain))),
+        y=alt.Y("value", axis=alt.Axis(title='Flow [l/min*bar]', offset = 60), scale=alt.Scale(domain=(0,0.0005))),
+        color = alt.Color("Flow")
+    )
+    axes.append(y3_axis)
 
-if "Temperature" in measurements:
-    temperature_df = pd.DataFrame(cycle_df[["Time", "i_TS1_cal"]])
-    temperature_df["i_TS1_cal"] = temperature_df["i_TS1_cal"] - 273.15
-    st.line_chart(temperature_df, x = "Time")
+if len(axes) > 0:
+    chart = alt.layer(*(axes)).resolve_scale(
+        y='independent'
+    ).interactive(bind_y=False).properties(height=500)
+
+    # display the chart
+    st.altair_chart(chart, use_container_width=True)

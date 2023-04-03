@@ -1,5 +1,5 @@
 numpy==1.22.3
 pandas==1.5.2
-streamlit==1.19.0
-plotly==5.13.1
+streamlit==1.20.0
 deta==1.1.0
+altair==4.2.2
