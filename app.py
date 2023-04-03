@@ -83,10 +83,6 @@ test_series = st.sidebar.selectbox("Choose test series:", list(range(1,7)))
 # load dataset
 dataset = load_data(f"{url}V{test_series}_data.csv")
 
-# Choose presented data or diagrams
-measurements = st.sidebar.multiselect("Choose presented measurements:", [
-    "Pressure", "Position", "Flow", "Temperature"])
-
 st.sidebar.write("---")
 st.sidebar.write("#### Error thresholds:")
 error_threshold_df = pd.DataFrame.from_dict(error_thresholds, columns=["value"], orient="index")
@@ -149,7 +145,7 @@ with col5:
 
 # Choose presented data or diagrams
 measurements = st.multiselect("Choose presented measurements:", [
-    "PS1", "PS2", "PS3", "Position", "Flow", "Temperature"])
+    "PS1", "PS2", "PS3", "Position", "Flow"])
 
 axes = []
 time_domain = cycle_df["time"].iloc[-1]
