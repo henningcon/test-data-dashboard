@@ -149,11 +149,11 @@ with col5:
 
 st.write("Choose presented measurements:")
 col1, col2, col3, col4, col5 = st.columns(5)
-ps1_check = col1.radiobutton("PS1")
-ps2_check = col2.radiobutton("PS2")
-ps3_check = col3.radiobutton("PS3")
-flow_check = col4.radiobutton("Flow")
-pos_check = col5.radoibutton("Position")
+ps1_check = col1.radio("PS1")
+ps2_check = col2.radio("PS2")
+ps3_check = col3.radio("PS3")
+flow_check = col4.radio("Flow")
+pos_check = col5.radio("Position")
 
 axes = []
 time_domain = cycle_df["time"].iloc[-1]
