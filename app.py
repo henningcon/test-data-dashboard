@@ -110,8 +110,8 @@ cycle_df = pd.DataFrame(dataset.loc[dataset["autoCounter"] == test_cycle])
 start_time = cycle_df["Timestamp UTC"].iloc[0]
 cycle_df["time"] = cycle_df["Timestamp UTC"].apply(lambda x: x - start_time)
 
-with st.expander("Click to see dataframe"):
-    st.write(cycle_df)
+# with st.expander("Click to see dataframe"):
+#     st.write(cycle_df)
 
 ### Diyplay the error parameters of the chosen test cycle
 
