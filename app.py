@@ -196,7 +196,7 @@ if "Flow" in measurements:
 if len(axes) > 0:
     chart = alt.layer(*(axes)).resolve_scale(
         y='independent'
-    ).interactive(bind_y=False).properties(height=500)
+    ).interactive(bind_y=False).properties(height=520)
 
     # display the chart
     st.altair_chart(chart, use_container_width=True)
