@@ -98,7 +98,6 @@ st.sidebar.dataframe(error_threshold_df, use_container_width=True)
 
 st.title("Visualize Test Data")
 st.write("Streamlit dashboard of measured test data from the press test bench. For further controls open the sidebar on the left.")
-st.write("---")
 
 # Chosen test series:
 st.write(f"### Test series: &ensp;{test_series}")
@@ -145,14 +144,10 @@ with col5:
     st.metric(label="Ext. Leakage [l/min*bar]", value=round(cycle_df["ext. leakage [l/min.bar]"].iloc[0],4))
     st.write(error_check[4])
 
-"---"
+### plotting
 
 axes = []
 time_domain = cycle_df["time"].iloc[-1]
-
-# ps1_bool = "PS1" in measurements
-# ps2_bool = "PS2" in measurements
-# ps3_bool = "PS3" in measurements
 
 if ("PS1" or "PS2" or "PS3") in measurements:
     pressure_df = pd.DataFrame([])
