@@ -154,7 +154,7 @@ time_domain = cycle_df["time"].iloc[-1]
 # ps2_bool = "PS2" in measurements
 # ps3_bool = "PS3" in measurements
 
-if "PS1" or "PS2" or "PS3" in measurements:
+if ("PS1" or "PS2" or "PS3") in measurements:
     pressure_df = pd.DataFrame([])
     pressure_df["time"] = cycle_df["time"]
     if "PS1" in measurements:
