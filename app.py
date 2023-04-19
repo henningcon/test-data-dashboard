@@ -99,12 +99,18 @@ st.sidebar.dataframe(error_threshold_df, use_container_width=True)
 st.title("Visualize Test Data")
 st.write("Streamlit dashboard of measured test data from the press test bench. For further controls open the sidebar on the left.")
 
+test_cycle = 1
+col1, col2, col3, col4, col5 = st.columns(5)
 # Chosen test series:
-st.write(f"### Test series: &ensp;{test_series}")
+col1.write(f"### Test series: &ensp;{test_series}")
+if col5.button("Cycle up"):
+    test_cycle += 1
+if col5.button("Cycle down"):
+    test_cycle -= 1
 
 # slider for choosing which test cycle is going to be displayed
 max_test_cycle = int(dataset["autoCounter"].iloc[-1])
-test_cycle = st.slider("Choose test cycle:", 1, max_test_cycle)
+test_cycle = st.slider("#### Choose test cycle:", 1, max_test_cycle)
 
 # creating dataframe of chosen test cycle from the dataset
 cycle_df = pd.DataFrame(dataset.loc[dataset["autoCounter"] == test_cycle])
