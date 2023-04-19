@@ -169,7 +169,7 @@ if ("PS1" or "PS2" or "PS3") in measurements:
     y1_axis = alt.Chart(melted).mark_line().encode(
         x=alt.X("time", axis=alt.Axis(title='Time [ms]', titleY=40), scale=alt.Scale(domain=(0,time_domain))),
         y=alt.Y("value", axis=alt.Axis(title='Pressure [bar]'), scale=alt.Scale(domain=(0,220))),
-        color = alt.Color("Pressure", legend=alt.Legend(orient="left"), title="")
+        color = alt.Color("Pressure", legend=alt.Legend(orient="bottom-left"), title="")
     )
     axes.append(y1_axis)
 
@@ -178,7 +178,7 @@ if "Position" in measurements:
     y2_axis = alt.Chart(position_df).mark_line().encode(
         x=alt.X("time", axis=alt.Axis(title='Time [ms]', titleY=40), scale=alt.Scale(domain=(0,time_domain))),
         y=alt.Y("value", axis=alt.Axis(title='Position [mm]'), scale=alt.Scale(domain=(0,400))),
-        color = alt.Color("Position", legend=alt.Legend(orient="left"), title="")
+        color = alt.Color("Position", legend=alt.Legend(orient="bottom-left"), title="")
     )
     axes.append(y2_axis)
 
@@ -187,7 +187,7 @@ if "Flow" in measurements:
     y3_axis = alt.Chart(flow_df).mark_line(color="purple").encode(
         x=alt.X("time", axis=alt.Axis(title='Time [ms]', titleY=40), scale=alt.Scale(domain=(0,time_domain))),
         y=alt.Y("value", axis=alt.Axis(title='Flow [l/min*bar]', offset = 60), scale=alt.Scale(domain=(0,0.0005))),
-        color = alt.Color("Flow", legend=alt.Legend(orient="left"), title="")
+        color = alt.Color("Flow", legend=alt.Legend(orient="bottom-left"), title="")
     )
     axes.append(y3_axis)
 
