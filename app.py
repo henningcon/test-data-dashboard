@@ -169,7 +169,7 @@ if ps1_bool or ps2_bool or ps3_bool:
 
 
     y1_axis = alt.Chart(melted).mark_line().encode(
-        x=alt.X("time", axis=alt.Axis(title='Time [ms]', titleY=20, scale=alt.Scale(domain=(0,time_domain))),
+        x=alt.X("time", axis=alt.Axis(title='Time [ms]', titleY=20), scale=alt.Scale(domain=(0,time_domain))),
         y=alt.Y("value", axis=alt.Axis(title='Pressure [bar]'), scale=alt.Scale(domain=(0,220))),
         color = alt.Color("Pressure", legend=alt.Legend(orient="left"), title="")
     )
@@ -197,7 +197,6 @@ if len(axes) > 0:
     chart = alt.layer(*(axes)).resolve_scale(
         y='independent'
     ).interactive(bind_y=False).properties(height=480)
-
 
     st.altair_chart(chart, use_container_width=True)
 
