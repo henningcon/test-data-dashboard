@@ -150,11 +150,11 @@ with col5:
 axes = []
 time_domain = cycle_df["time"].iloc[-1]
 
-ps1_bool = "PS1" in measurements
-ps2_bool = "PS2" in measurements
-ps3_bool = "PS3" in measurements
+# ps1_bool = "PS1" in measurements
+# ps2_bool = "PS2" in measurements
+# ps3_bool = "PS3" in measurements
 
-if ps1_bool or ps2_bool or ps3_bool:
+if "PS1" or "PS2" or "PS3" in measurements:
     pressure_df = pd.DataFrame([])
     pressure_df["time"] = cycle_df["time"]
     if "PS1" in measurements:
@@ -200,5 +200,3 @@ if len(axes) > 0:
 
     st.altair_chart(chart, use_container_width=True)
 
-if test_series == 3:
-    st.write("Hallo das ist ein Test")
