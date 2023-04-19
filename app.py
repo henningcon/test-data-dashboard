@@ -87,6 +87,9 @@ dataset = load_data(f"{url}V{test_series}_data.csv")
 measurements = st.sidebar.multiselect("Choose presented measurements:", [
     "PS1", "PS2", "PS3", "Position", "Flow"])
 
+if len(measurements) > 0:
+    plot_height = st.sidebar.number_input("Plot height in pixels:", min_value=300, max_value=700, value=500, step=5)
+
 st.sidebar.write("---")
 st.sidebar.write("#### Error thresholds:")
 error_threshold_df = pd.DataFrame.from_dict(error_thresholds, columns=["value"], orient="index")
@@ -104,7 +107,7 @@ st.write(f"### Test series: &ensp;{test_series}")
 
 # slider for choosing which test cycle is going to be displayed
 max_test_cycle = int(dataset["autoCounter"].iloc[-1])
-test_cycle = st.slider("#### Choose test cycle:", 1, max_test_cycle)
+test_cycle = st.slider("Choose test cycle:", 1, max_test_cycle)
 
 # creating dataframe of chosen test cycle from the dataset
 cycle_df = pd.DataFrame(dataset.loc[dataset["autoCounter"] == test_cycle])
@@ -191,7 +194,7 @@ if "Flow" in measurements:
 if len(axes) > 0:
     chart = alt.layer(*(axes)).resolve_scale(
         y='independent'
-    ).interactive(bind_y=False).properties(height=480)
+    ).interactive(bind_y=False).properties(height=plot_height)
 
     st.altair_chart(chart, use_container_width=True)
 
