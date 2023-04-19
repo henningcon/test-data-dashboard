@@ -199,4 +199,5 @@ if len(axes) > 0:
     ).interactive(bind_y=False).properties(height=480)
 
     # display the chart
-    st.altair_chart(chart, use_container_width=True)
+    with st.container()
+       st.altair_chart(chart, use_container_width=True)
