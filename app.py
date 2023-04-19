@@ -83,6 +83,10 @@ test_series = st.sidebar.selectbox("Choose test series:", list(range(1,7)))
 # load dataset
 dataset = load_data(f"{url}V{test_series}_data.csv")
 
+# Choose presented data or diagrams
+measurements = st.sidebar.multiselect("Choose presented measurements:", [
+    "PS1", "PS2", "PS3", "Position", "Flow"])
+
 st.sidebar.write("---")
 st.sidebar.write("#### Error thresholds:")
 error_threshold_df = pd.DataFrame.from_dict(error_thresholds, columns=["value"], orient="index")
@@ -143,29 +147,21 @@ with col5:
 
 "---"
 
-# Choose presented data or diagrams
-# measurements = st.multiselect("Choose presented measurements:", [
-#     "PS1", "PS2", "PS3", "Position", "Flow"])
-
-st.write("Choose presented measurements:")
-col1, col2, col3, col4, col5 = st.columns(5)
-ps1_check = col1.radio("PS1")
-ps2_check = col2.radio("PS2")
-ps3_check = col3.radio("PS3")
-flow_check = col4.radio("Flow")
-pos_check = col5.radio("Position")
-
 axes = []
 time_domain = cycle_df["time"].iloc[-1]
 
-if ps1_check or ps2_check or ps3_check:
+ps1_bool = "PS1" in measurements
+ps2_bool = "PS2" in measurements
+ps3_bool = "PS3" in measurements
+
+if ps1_bool or ps2_bool or ps3_bool:
     pressure_df = pd.DataFrame([])
     pressure_df["time"] = cycle_df["time"]
-    if ps1_check:
+    if "PS1" in measurements:
         pressure_df["PS1"] = cycle_df["pressure PS1"]
-    if ps2_check:
+    if "PS2" in measurements:
         pressure_df["PS2"] = cycle_df["pressure PS2"]
-    if ps3_check:
+    if "PS3" in measurements:
         pressure_df["PS3"] = cycle_df["pressure PS3"]
     # melt dataframe
     if len(pressure_df.columns) > 1:
@@ -179,7 +175,7 @@ if ps1_check or ps2_check or ps3_check:
     )
     axes.append(y1_axis)
 
-if pos_check:
+if "Position" in measurements:
     position_df = pd.melt(cycle_df[["time", "position"]], id_vars="time", var_name="Position", value_name="value")
     y2_axis = alt.Chart(position_df).mark_line().encode(
         x=alt.X("time", axis=alt.Axis(title='Time [ms]', titleY=40), scale=alt.Scale(domain=(0,time_domain))),
@@ -188,7 +184,7 @@ if pos_check:
     )
     axes.append(y2_axis)
 
-if flow_check:
+if "Flow" in measurements:
     flow_df = pd.melt(cycle_df[["time", "flow FS4"]], id_vars="time", var_name="Flow", value_name="value")
     y3_axis = alt.Chart(flow_df).mark_line(color="purple").encode(
         x=alt.X("time", axis=alt.Axis(title='Time [ms]', titleY=40), scale=alt.Scale(domain=(0,time_domain))),
@@ -204,3 +200,5 @@ if len(axes) > 0:
 
     st.altair_chart(chart, use_container_width=True)
 
+if test_series == 3:
+    st.write("Hallo das ist ein Test")
