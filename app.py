@@ -88,7 +88,7 @@ measurements = st.sidebar.multiselect("Choose presented measurements:", [
     "PS1", "PS2", "PS3", "Position", "Flow"])
 
 if len(measurements) > 0:
-    plot_height = st.sidebar.number_input("Plot height in pixels:", min_value=300, max_value=700, value=500, step=5)
+    plot_height = st.sidebar.number_input("Plot height in pixels:", min_value=300, max_value=700, value=500, step=10)
 
 st.sidebar.write("---")
 st.sidebar.write("#### Error thresholds:")
@@ -178,7 +178,7 @@ if "Position" in measurements:
     y2_axis = alt.Chart(position_df).mark_line().encode(
         x=alt.X("time", axis=alt.Axis(title='Time [ms]', titleY=40), scale=alt.Scale(domain=(0,time_domain))),
         y=alt.Y("value", axis=alt.Axis(title='Position [mm]'), scale=alt.Scale(domain=(0,400))),
-        color = alt.Color("Position")
+        color = alt.Color("Position", legend=alt.Legend(orient="left"), title="")
     )
     axes.append(y2_axis)
 
@@ -187,7 +187,7 @@ if "Flow" in measurements:
     y3_axis = alt.Chart(flow_df).mark_line(color="purple").encode(
         x=alt.X("time", axis=alt.Axis(title='Time [ms]', titleY=40), scale=alt.Scale(domain=(0,time_domain))),
         y=alt.Y("value", axis=alt.Axis(title='Flow [l/min*bar]', offset = 60), scale=alt.Scale(domain=(0,0.0005))),
-        color = alt.Color("Flow")
+        color = alt.Color("Flow", legend=alt.Legend(orient="left"), title="")
     )
     axes.append(y3_axis)
 
