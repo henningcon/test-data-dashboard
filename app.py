@@ -169,7 +169,7 @@ if ps1_bool or ps2_bool or ps3_bool:
 
 
     y1_axis = alt.Chart(melted).mark_line().encode(
-        x=alt.X("time", axis=alt.Axis(title='Time [ms]', titleY=20), scale=alt.Scale(domain=(0,time_domain))),
+        x=alt.X("time", axis=alt.Axis(title='Time [ms]', titleY=30), scale=alt.Scale(domain=(0,time_domain))),
         y=alt.Y("value", axis=alt.Axis(title='Pressure [bar]'), scale=alt.Scale(domain=(0,220))),
         color = alt.Color("Pressure", legend=alt.Legend(orient="left"), title="")
     )
@@ -178,7 +178,7 @@ if ps1_bool or ps2_bool or ps3_bool:
 if "Position" in measurements:
     position_df = pd.melt(cycle_df[["time", "position"]], id_vars="time", var_name="Position", value_name="value")
     y2_axis = alt.Chart(position_df).mark_line().encode(
-        x=alt.X("time", axis=alt.Axis(title='Time [ms]', titleY=20), scale=alt.Scale(domain=(0,time_domain))),
+        x=alt.X("time", axis=alt.Axis(title='Time [ms]', titleY=30), scale=alt.Scale(domain=(0,time_domain))),
         y=alt.Y("value", axis=alt.Axis(title='Position [mm]'), scale=alt.Scale(domain=(0,400))),
         color = alt.Color("Position")
     )
@@ -187,7 +187,7 @@ if "Position" in measurements:
 if "Flow" in measurements:
     flow_df = pd.melt(cycle_df[["time", "flow FS4"]], id_vars="time", var_name="Flow", value_name="value")
     y3_axis = alt.Chart(flow_df).mark_line(color="purple").encode(
-        x=alt.X("time", axis=alt.Axis(title='Time [ms]', titleY=20), scale=alt.Scale(domain=(0,time_domain))),
+        x=alt.X("time", axis=alt.Axis(title='Time [ms]'), scale=alt.Scale(domain=(0,time_domain))),
         y=alt.Y("value", axis=alt.Axis(title='Flow [l/min*bar]', offset = 60), scale=alt.Scale(domain=(0,0.0005))),
         color = alt.Color("Flow")
     )
