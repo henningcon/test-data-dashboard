@@ -41,6 +41,10 @@ css = '''
 <style>
     section.main > div {max-width: 80rem}
 </style>
+<style>
+.appview-container .main .block-container{{
+        padding-top: 0rem;    }}
+</style>
 '''
 st.markdown(css, unsafe_allow_html=True)
 
